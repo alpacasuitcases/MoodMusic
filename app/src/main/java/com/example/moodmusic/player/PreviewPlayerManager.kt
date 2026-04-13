@@ -7,7 +7,6 @@ import androidx.media3.exoplayer.ExoPlayer
 class PreviewPlayerManager(context: Context) {
 
     private val appContext = context.applicationContext
-
     val player: ExoPlayer = ExoPlayer.Builder(appContext).build()
 
     private var currentPreviewUrl: String? = null
@@ -30,18 +29,9 @@ class PreviewPlayerManager(context: Context) {
         player.playWhenReady = true
     }
 
-    fun stop() {
-        player.stop()
-        currentPreviewUrl = null
-    }
+    fun isCurrent(previewUrl: String?): Boolean = currentPreviewUrl == previewUrl
 
-    fun isCurrent(previewUrl: String?): Boolean {
-        return currentPreviewUrl == previewUrl
-    }
-
-    fun isPlaying(previewUrl: String?): Boolean {
-        return isCurrent(previewUrl) && player.isPlaying
-    }
+    fun isPlaying(previewUrl: String?): Boolean = isCurrent(previewUrl) && player.isPlaying
 
     fun release() {
         player.release()

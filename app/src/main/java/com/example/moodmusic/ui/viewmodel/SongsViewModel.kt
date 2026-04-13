@@ -8,6 +8,8 @@ import com.example.moodmusic.domain.model.Song
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.net.SocketException
+import java.net.UnknownHostException
 
 class SongsViewModel(
     private val repository: MusicRepository
@@ -19,10 +21,32 @@ class SongsViewModel(
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     fun loadSongsByMood(mood: MoodType) {
         viewModelScope.launch {
             _loading.value = true
-            _songs.value = repository.getSongsByMood(mood)
+            _error.value = null
+
+            val result = repository.getSongsByMood(mood)
+
+            result
+                .onSuccess { list ->
+                    _songs.value = list
+                    if (list.isEmpty()) {
+                        _error.value = "No se encontraron canciones para este mood"
+                    }
+                }
+                .onFailure { e ->
+                    _songs.value = emptyList()
+                    _error.value = when (e) {
+                        is UnknownHostException -> "No hay conexión a Internet"
+                        is SocketException -> "El emulador no puede conectarse a Internet"
+                        else -> "Error al cargar canciones"
+                    }
+                }
+
             _loading.value = false
         }
     }

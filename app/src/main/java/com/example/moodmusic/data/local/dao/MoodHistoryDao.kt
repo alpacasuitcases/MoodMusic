@@ -14,5 +14,5 @@ interface MoodHistoryDao {
     fun getAllMoodHistory(): Flow<List<MoodHistoryEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(entry: MoodHistoryEntity)
+    suspend fun insertMood(entry: MoodHistoryEntity)
 }

@@ -1,5 +1,6 @@
 package com.example.moodmusic.data.repository
 
+import android.util.Log
 import com.example.moodmusic.data.remote.api.ItunesApiService
 import com.example.moodmusic.data.remote.mapper.toDomain
 import com.example.moodmusic.domain.model.MoodType
@@ -8,26 +9,25 @@ import com.example.moodmusic.domain.model.Song
 class MusicRepository(
     private val api: ItunesApiService
 ) {
-    suspend fun getSongsByMood(mood: MoodType): List<Song> {
-        val query = mapMoodToQuery(mood)
-        val response = api.searchSongs(term = query, limit = 20)
+    suspend fun getSongsByMood(mood: MoodType): Result<List<Song>> {
+        return try {
+            val response = api.searchSongs(term = mood.query)
 
-        return response.results
-            .mapNotNull { dto ->
-                val id = dto.trackId?.toString()
-                if (id.isNullOrEmpty()) null else dto.toDomain(mood.name)
-            }
-            .distinctBy { it.id }
-    }
+            Log.d("MoodMusic", "Mood: ${mood.name} | resultCount: ${response.resultCount}")
 
-    private fun mapMoodToQuery(mood: MoodType): String {
-        return when (mood) {
-            MoodType.HAPPY -> "happy upbeat pop"
-            MoodType.SAD -> "sad acoustic emotional"
-            MoodType.RELAXED -> "relax calm chill"
-            MoodType.FOCUSED -> "focus study instrumental"
-            MoodType.ENERGETIC -> "workout dance energy"
-            MoodType.ROMANTIC -> "romantic love songs"
+            val songs = response.results
+                .map { it.toDomain(mood.name) }
+                .filter {
+                    it.id.isNotBlank() &&
+                            it.title.isNotBlank() &&
+                            it.artist.isNotBlank()
+                }
+                .distinctBy { it.id }
+
+            Result.success(songs)
+        } catch (e: Exception) {
+            Log.e("MoodMusic", "Error cargando canciones", e)
+            Result.failure(e)
         }
     }
 }

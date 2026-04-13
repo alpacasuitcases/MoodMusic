@@ -5,7 +5,7 @@ import com.example.moodmusic.domain.model.Song
 
 fun ItunesSongDto.toDomain(moodTag: String): Song {
     return Song(
-        id = trackId?.toString() ?: "",
+        id = (trackId ?: 0L).toString(),
         title = trackName.orEmpty(),
         artist = artistName.orEmpty(),
         album = collectionName.orEmpty(),

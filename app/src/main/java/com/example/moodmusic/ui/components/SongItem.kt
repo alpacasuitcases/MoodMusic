@@ -8,9 +8,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -33,55 +34,68 @@ fun SongItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp)
-            .clickable { onSongClick() }
+            .padding(vertical = 8.dp)
+            .clickable { onSongClick() },
+        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+        shape = MaterialTheme.shapes.large
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            if (song.artworkUrl.isNotBlank()) {
+        Column(modifier = Modifier.padding(16.dp)) {
+
+            if (!song.imageUrl.isNullOrBlank()) {
                 AsyncImage(
-                    model = song.artworkUrl,
+                    model = song.imageUrl,
                     contentDescription = song.title,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(180.dp)
+                        .height(220.dp)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
 
             Text(
                 text = song.title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleLarge
             )
+
+            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = song.artist,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyLarge
             )
 
             if (song.album.isNotBlank()) {
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = song.album,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            Button(
+                onClick = onPreviewClick,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Button(onClick = onPreviewClick) {
-                    Text(if (isPreviewPlaying) "Pausar preview" else "Escuchar preview")
-                }
-
-                OutlinedButton(onClick = onToggleFavorite) {
-                    Text(if (isFavorite) "Quitar favorito" else "Favorito")
-                }
+                Text(if (isPreviewPlaying) "Pausar preview" else "Escuchar preview")
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            OutlinedButton(onClick = onOpenExternal) {
+            OutlinedButton(
+                onClick = onToggleFavorite,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(if (isFavorite) "Quitar de favoritos" else "Añadir a favoritos")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedButton(
+                onClick = onOpenExternal,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text("Abrir canción completa")
             }
         }

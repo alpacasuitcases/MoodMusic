@@ -28,7 +28,7 @@ abstract class MoodMusicDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     MoodMusicDatabase::class.java,
-                    "moodmusic_database"
+                    "moodmusic_db"
                 ).build()
                 INSTANCE = instance
                 instance

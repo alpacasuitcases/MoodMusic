@@ -3,7 +3,6 @@ package com.example.moodmusic.data.local
 import com.example.moodmusic.data.local.entity.FavoriteSongEntity
 import com.example.moodmusic.data.local.entity.MoodHistoryEntity
 import com.example.moodmusic.domain.model.MoodEntry
-import com.example.moodmusic.domain.model.MoodType
 import com.example.moodmusic.domain.model.Song
 
 fun Song.toEntity(): FavoriteSongEntity {
@@ -35,7 +34,7 @@ fun FavoriteSongEntity.toDomain(): Song {
 fun MoodHistoryEntity.toDomain(): MoodEntry {
     return MoodEntry(
         id = id,
-        mood = MoodType.valueOf(mood),
+        moodName = moodName,
         timestamp = timestamp
     )
 }

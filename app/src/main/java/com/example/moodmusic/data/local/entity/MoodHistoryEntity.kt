@@ -7,6 +7,6 @@ import androidx.room.PrimaryKey
 data class MoodHistoryEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val mood: String,
+    val moodName: String,
     val timestamp: Long
 )

@@ -12,7 +12,7 @@ class MoodViewModel(
 
     fun saveMood(mood: MoodType) {
         viewModelScope.launch {
-            repository.insertMood(mood)
+            repository.addMood(mood.label)
         }
     }
 }

@@ -13,12 +13,9 @@ interface FavoriteSongDao {
     @Query("SELECT * FROM favorite_songs ORDER BY title ASC")
     fun getAllFavorites(): Flow<List<FavoriteSongEntity>>
 
-    @Query("SELECT EXISTS(SELECT 1 FROM favorite_songs WHERE id = :songId)")
-    fun isFavorite(songId: String): Flow<Boolean>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(song: FavoriteSongEntity)
+    suspend fun insertFavorite(song: FavoriteSongEntity)
 
     @Query("DELETE FROM favorite_songs WHERE id = :songId")
-    suspend fun deleteById(songId: String)
+    suspend fun deleteFavorite(songId: String)
 }
