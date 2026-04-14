@@ -76,7 +76,7 @@ fun SongsScreen(
         }
 
         Text(
-            text = "Canciones para ${mood.label}",
+            text = "${mood.emoji} Canciones para ${mood.label}",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
