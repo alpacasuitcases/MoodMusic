@@ -18,6 +18,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(AppBackground)
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
@@ -27,12 +28,16 @@ fun HomeScreen(
         )
 
         Text(
-            text = "Descubre canciones según tu estado de ánimo",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
+            text = "Descubre música según cómo te sientes",
+            modifier = Modifier.padding(top = 8.dp)
         )
 
-        Button(onClick = onStartClick) {
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onStartClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text("Empezar")
         }
     }

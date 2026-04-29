@@ -1,13 +1,14 @@
 package com.example.moodmusic.ui.navigation
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.moodmusic.di.AppContainer
-import com.example.moodmusic.domain.model.MoodType
 import com.example.moodmusic.ui.screens.favorites.FavoritesScreen
 import com.example.moodmusic.ui.screens.history.HistoryScreen
 import com.example.moodmusic.ui.screens.home.HomeScreen
@@ -15,7 +16,6 @@ import com.example.moodmusic.ui.screens.mood.MoodSelectionScreen
 import com.example.moodmusic.ui.screens.songs.SongsScreen
 import com.example.moodmusic.ui.viewmodel.HistoryViewModel
 import com.example.moodmusic.ui.viewmodel.factory.HistoryViewModelFactory
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun AppNavigation() {
@@ -37,9 +37,15 @@ fun AppNavigation() {
             )
 
             MoodSelectionScreen(
-                onMoodSelected = { mood ->
-                    historyViewModel.addMood(mood.label)
-                    navController.navigate(Routes.Songs.createRoute(mood.name))
+                onEmotionSelected = { emotion ->
+                    historyViewModel.addMood("${emotion.emoji} ${emotion.text}")
+                    navController.navigate(
+                        Routes.Songs.createRoute(
+                            query = emotion.query,
+                            emotionName = emotion.text,
+                            emoji = emotion.emoji
+                        )
+                    )
                 },
                 onFavoritesClick = { navController.navigate(Routes.Favorites.route) },
                 onHistoryClick = { navController.navigate(Routes.History.route) }
@@ -48,11 +54,20 @@ fun AppNavigation() {
 
         composable(
             route = Routes.Songs.route,
-            arguments = listOf(navArgument("mood") { type = NavType.StringType })
+            arguments = listOf(
+                navArgument("query") { type = NavType.StringType },
+                navArgument("emotionName") { type = NavType.StringType },
+                navArgument("emoji") { type = NavType.StringType }
+            )
         ) { backStackEntry ->
-            val moodArg = backStackEntry.arguments?.getString("mood") ?: MoodType.HAPPY.name
+            val query = Uri.decode(backStackEntry.arguments?.getString("query") ?: "happy music")
+            val emotionName = Uri.decode(backStackEntry.arguments?.getString("emotionName") ?: "Alegría")
+            val emoji = Uri.decode(backStackEntry.arguments?.getString("emoji") ?: "😄")
+
             SongsScreen(
-                mood = MoodType.valueOf(moodArg),
+                query = query,
+                emotionName = emotionName,
+                emoji = emoji,
                 onBackClick = { navController.popBackStack() }
             )
         }

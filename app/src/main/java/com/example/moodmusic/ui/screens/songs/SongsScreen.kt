@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -27,7 +27,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moodmusic.di.AppContainer
-import com.example.moodmusic.domain.model.MoodType
 import com.example.moodmusic.player.PreviewPlayerManager
 import com.example.moodmusic.ui.components.SongItem
 import com.example.moodmusic.ui.viewmodel.FavoritesViewModel
@@ -37,7 +36,9 @@ import com.example.moodmusic.ui.viewmodel.factory.SongsViewModelFactory
 
 @Composable
 fun SongsScreen(
-    mood: MoodType,
+    query: String,
+    emotionName: String,
+    emoji: String,
     onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
@@ -57,8 +58,8 @@ fun SongsScreen(
 
     val previewManager = remember { PreviewPlayerManager(context) }
 
-    LaunchedEffect(mood) {
-        songsViewModel.loadSongsByMood(mood)
+    LaunchedEffect(query) {
+        songsViewModel.searchSongs(query)
     }
 
     DisposableEffect(Unit) {
@@ -76,13 +77,13 @@ fun SongsScreen(
         }
 
         Text(
-            text = "${mood.emoji} Canciones para ${mood.label}",
+            text = "$emoji Canciones para $emotionName",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
         Text(
-            text = "Descubre música según cómo te sientes",
+            text = "Búsqueda: $query",
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
         )
@@ -120,7 +121,7 @@ fun SongsScreen(
                             )
 
                             Button(
-                                onClick = { songsViewModel.loadSongsByMood(mood) },
+                                onClick = { songsViewModel.searchSongs(query) },
                                 modifier = Modifier.padding(top = 16.dp)
                             ) {
                                 Text("Reintentar")
