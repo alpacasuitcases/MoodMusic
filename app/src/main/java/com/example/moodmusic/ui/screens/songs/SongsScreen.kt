@@ -2,6 +2,7 @@ package com.example.moodmusic.ui.screens.songs
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moodmusic.di.AppContainer
 import com.example.moodmusic.player.PreviewPlayerManager
 import com.example.moodmusic.ui.components.SongItem
+import com.example.moodmusic.ui.theme.AppBackground
 import com.example.moodmusic.ui.viewmodel.FavoritesViewModel
 import com.example.moodmusic.ui.viewmodel.SongsViewModel
 import com.example.moodmusic.ui.viewmodel.factory.FavoritesViewModelFactory
@@ -68,7 +70,11 @@ fun SongsScreen(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppBackground)
+    ) {
         TextButton(
             onClick = onBackClick,
             modifier = Modifier.padding(start = 8.dp, top = 8.dp)
@@ -79,13 +85,13 @@ fun SongsScreen(
         Text(
             text = "$emoji Canciones para $emotionName",
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
         )
 
         Text(
-            text = "Búsqueda: $query",
+            text = "Playlist generada según tu emoción",
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
         )
 
         when {
@@ -133,7 +139,12 @@ fun SongsScreen(
 
             else -> {
                 LazyColumn(
-                    contentPadding = PaddingValues(16.dp)
+                    contentPadding = PaddingValues(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 12.dp,
+                        bottom = 24.dp
+                    )
                 ) {
                     items(songs, key = { it.id }) { song ->
                         val isFavorite = favoriteIds.contains(song.id)

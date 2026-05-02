@@ -74,7 +74,7 @@ fun MoodPicker(
 
             moodLabels.forEach { emotion ->
                 val selected = emotion == selectedEmotion
-                val color = emotionColor(emotion.angle)
+                val color = emotionColor(emotion.mood)
 
                 val path = createPetalPath(
                     center = center,
@@ -220,14 +220,14 @@ private fun polar(
     )
 }
 
-private fun emotionColor(angle: Float): Color {
-    return when {
-        angle < 60f -> Color(0xFFFF6B6B)      // rojo
-        angle < 120f -> Color(0xFFFFA94D)     // naranja
-        angle < 180f -> Color(0xFFFFE066)     // amarillo
-        angle < 240f -> Color(0xFF69DB7C)     // verde
-        angle < 300f -> Color(0xFF74C0FC)     // azul
-        else -> Color(0xFFB197FC)             // morado
+private fun emotionColor(mood: MoodType): Color {
+    return when (mood) {
+        MoodType.HAPPY -> Color(0xFFFFD166)   // amarillo cálido
+        MoodType.RELAX -> Color(0xFF7BDCB5)   // verde agua
+        MoodType.SAD -> Color(0xFF74C0FC)     // azul suave
+        MoodType.ENERGY -> Color(0xFFFF9F6E)  // naranja coral
+        MoodType.FOCUS -> Color(0xFFB197FC)   // lavanda
+        MoodType.ANGRY -> Color(0xFFFF6B6B)   // rojo coral
     }
 }
 

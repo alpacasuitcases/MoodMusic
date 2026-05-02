@@ -2,6 +2,7 @@ package com.example.moodmusic.ui.screens.favorites
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,21 +10,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moodmusic.di.AppContainer
 import com.example.moodmusic.player.PreviewPlayerManager
 import com.example.moodmusic.ui.components.SongItem
+import com.example.moodmusic.ui.theme.AppBackground
 import com.example.moodmusic.ui.viewmodel.FavoritesViewModel
 import com.example.moodmusic.ui.viewmodel.factory.FavoritesViewModelFactory
 
@@ -47,13 +49,23 @@ fun FavoritesScreen(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Button(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppBackground)
+    ) {
+        TextButton(
             onClick = onBackClick,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(start = 8.dp, top = 8.dp)
         ) {
-            Text("Volver")
+            Text("← Volver")
         }
+
+        Text(
+            text = "Tus canciones favoritas",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+        )
 
         if (favorites.isEmpty()) {
             Column(
@@ -64,7 +76,7 @@ fun FavoritesScreen(
             ) {
                 Text(
                     text = "Todavía no tienes canciones favoritas",
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleLarge
                 )
             }
             return
