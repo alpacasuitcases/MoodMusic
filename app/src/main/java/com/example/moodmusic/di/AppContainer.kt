@@ -6,6 +6,7 @@ import com.example.moodmusic.data.remote.api.RetrofitInstance
 import com.example.moodmusic.data.repository.FavoritesRepository
 import com.example.moodmusic.data.repository.MoodHistoryRepository
 import com.example.moodmusic.data.repository.MusicRepository
+import com.example.moodmusic.data.repository.PlaylistRepository
 
 object AppContainer {
 
@@ -25,6 +26,10 @@ object AppContainer {
 
     val moodHistoryRepository: MoodHistoryRepository by lazy {
         MoodHistoryRepository(database.moodHistoryDao())
+    }
+
+    val playlistRepository: PlaylistRepository by lazy {
+        PlaylistRepository(database.playlistDao())
     }
 
     fun init(context: Context) {

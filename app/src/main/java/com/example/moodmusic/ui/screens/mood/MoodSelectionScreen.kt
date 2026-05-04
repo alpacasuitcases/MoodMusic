@@ -32,7 +32,8 @@ import com.example.moodmusic.ui.theme.colorForMood
 fun MoodSelectionScreen(
     onEmotionSelected: (EmotionLabel) -> Unit,
     onFavoritesClick: () -> Unit,
-    onHistoryClick: () -> Unit
+    onHistoryClick: () -> Unit,
+    onPlaylistsClick: () -> Unit
 ) {
     var selectedEmotion by remember { mutableStateOf<EmotionLabel?>(null) }
 
@@ -125,6 +126,13 @@ fun MoodSelectionScreen(
             shape = RoundedCornerShape(50.dp)
         ) {
             Text("Ver historial")
+        }
+
+        OutlinedButton(
+            onClick = onPlaylistsClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Ver playlists")
         }
     }
 }
