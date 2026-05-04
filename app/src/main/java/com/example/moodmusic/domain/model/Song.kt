@@ -8,5 +8,6 @@ data class Song(
     val imageUrl: String?,
     val previewUrl: String?,
     val trackUrl: String?,
-    val moodTag: String
+    val moodTag: String,
+    val lyrics: String? = null
 )

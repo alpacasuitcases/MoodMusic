@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -81,11 +82,27 @@ fun PlayerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                var showLyrics by remember { mutableStateOf(false) }
 
+                OutlinedButton(onClick = {
+                    showLyrics = !showLyrics
+                }) {
+                    Text(if (showLyrics) "Ocultar letra" else "Ver letra")
+                }
+                if (showLyrics) {
+                    Text(
+                        text = currentSong?.lyrics ?: "No hay letra disponible",
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                    )
+                }
                 AsyncImage(
                     model = currentSong?.imageUrl,
                     contentDescription = "",
-                    modifier = Modifier.size(260.dp),
+                    modifier = Modifier
+                        .size(280.dp)
+                        .clip(RoundedCornerShape(20.dp)),
                     contentScale = ContentScale.Crop
                 )
 
@@ -100,6 +117,13 @@ fun PlayerScreen(
                     text = currentSong?.artist ?: "",
                     style = MaterialTheme.typography.bodyLarge
                 )
+
+                if (!currentSong?.album.isNullOrBlank()) {
+                    Text(
+                        text = currentSong?.album ?: "",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {

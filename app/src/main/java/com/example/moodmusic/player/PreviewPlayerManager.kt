@@ -8,7 +8,6 @@ class PreviewPlayerManager(context: Context) {
 
     private val appContext = context.applicationContext
     val player: ExoPlayer = ExoPlayer.Builder(appContext).build()
-
     private var currentPreviewUrl: String? = null
 
     fun playOrPause(previewUrl: String?) {
