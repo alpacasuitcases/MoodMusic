@@ -140,12 +140,7 @@ fun AppNavigation() {
                 backStackEntry.arguments?.getString("mood") ?: "HAPPY"
             )
 
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(Routes.SongsRoot.route)
-            }
-
             val songsViewModel: SongsViewModel = viewModel(
-                parentEntry,
                 factory = SongsViewModelFactory(
                     AppContainer.musicRepository,
                     AppContainer.playlistRepository
@@ -153,6 +148,7 @@ fun AppNavigation() {
             )
 
             val songs by songsViewModel.currentPlaylist.collectAsState()
+
             PlayerScreen(
                 songs = songs,
                 startIndex = index,
