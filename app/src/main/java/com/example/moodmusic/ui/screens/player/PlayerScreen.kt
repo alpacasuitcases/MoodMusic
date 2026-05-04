@@ -4,7 +4,9 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,6 +16,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -22,6 +25,7 @@ import com.example.moodmusic.domain.model.Song
 import com.example.moodmusic.player.PreviewPlayerManager
 import com.example.moodmusic.ui.components.MoodBackground
 import com.example.moodmusic.ui.theme.colorForMood
+import kotlinx.coroutines.delay
 
 @Composable
 fun PlayerScreen(
@@ -32,26 +36,51 @@ fun PlayerScreen(
 ) {
 
     val context = LocalContext.current
+
     val previewManager = remember { PreviewPlayerManager(context) }
+    val playingUrl by previewManager.playingUrl.collectAsState()
 
     var currentIndex by remember { mutableStateOf(startIndex) }
     val currentSong = songs.getOrNull(currentIndex)
 
-    var isPlaying by remember { mutableStateOf(false) }
+    var showLyrics by remember { mutableStateOf(false) }
     var isLoop by remember { mutableStateOf(false) }
+
+    var progress by remember { mutableStateOf(0f) }
+    val isPlaying = playingUrl != null && playingUrl == currentSong?.previewUrl
+
+    // Autoplay al cambiar de canción
+    LaunchedEffect(currentIndex) {
+        progress = 0f
+        val url = currentSong?.previewUrl
+        if (!url.isNullOrBlank()) {
+            previewManager.stop()
+            previewManager.playOrPause(url)
+        }
+    }
+    // Avanzar la barra de progreso mientras suena
+    LaunchedEffect(isPlaying, currentIndex) {
+        while (isPlaying) {
+            delay(300L)
+            progress = (progress + 0.01f).coerceAtMost(1f)
+            if (progress >= 1f) {
+                if (isLoop) {
+                    progress = 0f
+                    currentSong?.previewUrl?.let {
+                        previewManager.stop()
+                        previewManager.playOrPause(it)
+                    }
+                } else if (currentIndex < songs.size - 1) {
+                    currentIndex++
+                }
+            }
+        }
+    }
 
     DisposableEffect(Unit) {
         onDispose { previewManager.release() }
     }
-
-    // AUTOPLAY
-    LaunchedEffect(currentIndex) {
-        currentSong?.previewUrl?.let {
-            previewManager.playOrPause(it)
-            isPlaying = true
-        }
-    }
-
+    // Interfaz de usuario
     Box(modifier = Modifier.fillMaxSize()) {
 
         // Fondo dinámico
@@ -64,131 +93,189 @@ fun PlayerScreen(
                     )
                 )
         )
-
-        MoodBackground(mood)
+        MoodBackground(mood = mood, modifier = Modifier.fillMaxSize())
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            TextButton(onClick = { navController.popBackStack() }) {
-                Text("← Volver")
+            TextButton(onClick = {
+                previewManager.stop()
+                navController.popBackStack()
+            }) {
+                Text("← Volver", color = Color.White)
             }
 
+            // Carátula
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(Color.White.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center
+            ) {
+                if (!currentSong?.imageUrl.isNullOrBlank()) {
+                    AsyncImage(
+                        model = currentSong?.imageUrl,
+                        contentDescription = currentSong?.title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(28.dp))
+                    )
+                } else {
+                    Text("🎵", style = MaterialTheme.typography.displayLarge)
+                }
+            }
+
+            // Título, artista, album
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                var showLyrics by remember { mutableStateOf(false) }
-
-                OutlinedButton(onClick = {
-                    showLyrics = !showLyrics
-                }) {
-                    Text(if (showLyrics) "Ocultar letra" else "Ver letra")
-                }
-                if (showLyrics) {
-                    Text(
-                        text = currentSong?.lyrics ?: "No hay letra disponible",
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    )
-                }
-                AsyncImage(
-                    model = currentSong?.imageUrl,
-                    contentDescription = "",
-                    modifier = Modifier
-                        .size(280.dp)
-                        .clip(RoundedCornerShape(20.dp)),
-                    contentScale = ContentScale.Crop
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
                 Text(
-                    text = currentSong?.title ?: "",
-                    style = MaterialTheme.typography.headlineMedium
+                    text = currentSong?.title ?: "—",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
+                    textAlign = TextAlign.Center
                 )
-
                 Text(
                     text = currentSong?.artist ?: "",
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White.copy(alpha = 0.80f),
+                    textAlign = TextAlign.Center
                 )
-
                 if (!currentSong?.album.isNullOrBlank()) {
                     Text(
                         text = currentSong?.album ?: "",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.60f),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            // Barra de progreso
+            Slider(
+                value = progress,
+                onValueChange = { progress = it },
+                colors = SliderDefaults.colors(
+                    thumbColor = Color.White,
+                    activeTrackColor = Color.White,
+                    inactiveTrackColor = Color.White.copy(alpha = 0.28f)
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Controles
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // Anterior
+                FilledTonalButton(
+                    onClick = {
+                        if (currentIndex > 0) {
+                            currentIndex--
+                            progress = 0f
+                        }
+                    },
+                    enabled = currentIndex > 0
+                ) { Text("⏮\uFE0F", style = MaterialTheme.typography.titleLarge) }
+
+                // Play / Pausa — BOTÓN PRINCIPAL
+                Button(
+                    onClick = {
+                        currentSong?.previewUrl?.let { url ->
+                            previewManager.playOrPause(url)
+                        }
+                    },
+                    modifier = Modifier.size(72.dp),
+                    shape = RoundedCornerShape(50),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                ) {
+                    Text(
+                        text = if (isPlaying) "⏸\uFE0F" else "▶\uFE0F",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color.Black
+                    )
+                }
+
+                // Siguiente
+                FilledTonalButton(
+                    onClick = {
+                        if (currentIndex < songs.size - 1) {
+                            currentIndex++
+                            progress = 0f
+                        }
+                    },
+                    enabled = currentIndex < songs.size - 1
+                ) { Text("⏭\uFE0F", style = MaterialTheme.typography.titleLarge) }
+            }
+
+            // Bucle y abrir en completo
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedButton(
+                    onClick = { isLoop = !isLoop },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+                ) {
+                    Text(if (isLoop) "🔁 Loop ON" else "🔁 Loop OFF")
+                }
+
+                OutlinedButton(
+                    onClick = {
+                        currentSong?.trackUrl?.let {
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it)))
+                        }
+                    },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+                ) {
+                    Text("🎵 iTunes")
+                }
+            }
+
+            //Letra
+            OutlinedButton(
+                onClick = { showLyrics = !showLyrics },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+            ) {
+                Text(if (showLyrics) "Ocultar letra" else "Ver letra")
+            }
+
+            if (showLyrics) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Black.copy(alpha = 0.35f)
+                    )
+                ) {
+                    Text(
+                        text = currentSong?.lyrics
+                            ?: "No hay letra disponible.\nAbre la canción completa en iTunes para verla.",
+                        modifier = Modifier.padding(16.dp),
+                        color = Color.White.copy(alpha = 0.90f),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-                // ▶️ PLAY / PAUSE
-                Button(
-                    onClick = {
-                        previewManager.playOrPause(currentSong?.previewUrl)
-                        isPlaying = !isPlaying
-                    }
-                ) {
-                    Text(if (isPlaying) "Pause ⏸" else "Play ▶")
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-
-                    // ⏮ ANTERIOR
-                    Button(onClick = {
-                        if (currentIndex > 0) {
-                            currentIndex--
-                        }
-                    }) {
-                        Text("⏮")
-                    }
-
-                    // ⏭ SIGUIENTE
-                    Button(onClick = {
-                        if (currentIndex < songs.size - 1) {
-                            currentIndex++
-                        } else if (isLoop) {
-                            currentIndex = 0
-                        }
-                    }) {
-                        Text("⏭")
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // 🔁 LOOP
-                OutlinedButton(
-                    onClick = { isLoop = !isLoop }
-                ) {
-                    Text(if (isLoop) "Loop ON 🔁" else "Loop OFF")
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // 🌍 ABRIR COMPLETA
-                OutlinedButton(
-                    onClick = {
-                        currentSong?.trackUrl?.let {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
-                            context.startActivity(intent)
-                        }
-                    }
-                ) {
-                    Text("Abrir completa")
-                }
-            }
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

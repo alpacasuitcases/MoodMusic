@@ -7,6 +7,7 @@ import com.example.moodmusic.data.repository.FavoritesRepository
 import com.example.moodmusic.data.repository.MoodHistoryRepository
 import com.example.moodmusic.data.repository.MusicRepository
 import com.example.moodmusic.data.repository.PlaylistRepository
+import com.example.moodmusic.domain.model.Song
 
 object AppContainer {
 
@@ -35,4 +36,6 @@ object AppContainer {
     fun init(context: Context) {
         appContext = context.applicationContext
     }
+
+    var playerQueue: List<Song> = emptyList()
 }

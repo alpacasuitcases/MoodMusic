@@ -30,4 +30,9 @@ sealed class Routes(val route: String) {
         fun createRoute(index: Int, mood: String) =
             "player/$index/$mood"
     }
+
+    data object Dashboard : Routes("dashboard/{mood}/{emotion}") {
+        fun createRoute(mood: String, emotion: String) =
+            "dashboard/$mood/$emotion"
+    }
 }

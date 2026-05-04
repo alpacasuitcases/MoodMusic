@@ -23,8 +23,10 @@ import com.example.moodmusic.ui.components.SongItem
 import com.example.moodmusic.ui.navigation.Routes
 import com.example.moodmusic.ui.theme.colorForMood
 import com.example.moodmusic.ui.viewmodel.FavoritesViewModel
+import com.example.moodmusic.ui.viewmodel.HistoryViewModel
 import com.example.moodmusic.ui.viewmodel.SongsViewModel
 import com.example.moodmusic.ui.viewmodel.factory.FavoritesViewModelFactory
+import com.example.moodmusic.ui.viewmodel.factory.HistoryViewModelFactory
 import com.example.moodmusic.ui.viewmodel.factory.SongsViewModelFactory
 
 @Composable
@@ -36,7 +38,6 @@ fun SongsScreen(
     onBackClick: () -> Unit,
     navController: NavController
 ) {
-
     val context = LocalContext.current
 
     val songsViewModel: SongsViewModel = viewModel(
@@ -50,108 +51,113 @@ fun SongsScreen(
         factory = FavoritesViewModelFactory(AppContainer.favoritesRepository)
     )
 
+    val historyViewModel: HistoryViewModel = viewModel(
+        factory = HistoryViewModelFactory(AppContainer.moodHistoryRepository)
+    )
+
     val songs by songsViewModel.songs.collectAsState()
     val favoriteIds by favoritesViewModel.favoriteIds.collectAsState()
 
     val previewManager = remember { PreviewPlayerManager(context) }
+    val playingUrl by previewManager.playingUrl.collectAsState()
 
     // Cargar canciones
     LaunchedEffect(query) {
         songsViewModel.searchSongs(query, mood, emotionName)
     }
 
+    // Guardar en historial
+    LaunchedEffect(emotionName) {
+        historyViewModel.addMood("$emoji $emotionName")
+    }
     DisposableEffect(Unit) {
         onDispose { previewManager.release() }
     }
 
-    val mood = when (emotionName) {
-        "Alegría", "Inspiración", "Ilusión" -> MoodType.HAPPY
-        "Motivación", "Energía" -> MoodType.ENERGY
-        "Relajo", "Tranquilidad", "Equilibrio", "Comodidad" -> MoodType.RELAX
-        "Soledad", "Tristeza", "Cansancio", "Aburrimiento" -> MoodType.SAD
-        "Ansiedad", "Enfado", "Frustración" -> MoodType.ANGRY
-        else -> MoodType.RELAX
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        colorForMood(mood),
-                        androidx.compose.ui.graphics.Color.White
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Fondo con gradiente + animación
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            colorForMood(mood),
+                            androidx.compose.ui.graphics.Color.White
+                        )
                     )
                 )
-            )
-    ) {
-        val context = LocalContext.current
-        TextButton(onClick = onBackClick) {
-            Text("← Volver")
-        }
-
-        Text(
-            text = "$emoji Canciones para $emotionName",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(16.dp)
         )
-        Button(
-            onClick = {
-                songsViewModel.saveCurrentPlaylist(
-                    name = "Playlist $emotionName"
-                )
+        MoodBackground(mood = mood, modifier = Modifier.fillMaxSize())
 
-                Toast.makeText(
-                    context,
-                    "Playlist guardada",
-                    Toast.LENGTH_SHORT
-                ).show()
-            },
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth()
-        ) {
-            Text("💾 Guardar playlist")
-        }
-        LazyColumn {
+        Column(modifier = Modifier.fillMaxSize()) {
 
-            itemsIndexed(songs) { index, song ->
+            TextButton(onClick = onBackClick) {
+                Text("← Volver")
+            }
 
-                val isFavorite = favoriteIds.contains(song.id)
+            Text(
+                text = "$emoji Canciones para $emotionName",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+            )
 
-                SongItem(
-                    song = song,
-                    isFavorite = isFavorite,
-                    isPreviewPlaying = previewManager.isPlaying(song.previewUrl),
-
-                    // 🎧 PLAYER
-                    onSongClick = {
-
-                        songsViewModel.setPlaylist(songs)
-
-                        navController.navigate(
-                            Routes.Player.createRoute(
-                                index,
-                                mood.name
-                            )
+            Button(
+                onClick = {
+                    songsViewModel.saveCurrentPlaylist(name = "Playlist $emotionName")
+                    Toast.makeText(context, "Playlist guardada ✔", Toast.LENGTH_SHORT).show()
+                    navController.navigate(
+                        Routes.Dashboard.createRoute(
+                            mood = mood.name,
+                            emotion = Uri.encode("$emoji $emotionName")
                         )
-                    },
-
-                    onToggleFavorite = {
-                        favoritesViewModel.toggleFavorite(song, isFavorite)
-                    },
-
-                    onPreviewClick = {
-                        previewManager.playOrPause(song.previewUrl)
-                    },
-
-                    onOpenExternal = {
-                        song.trackUrl?.let {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
-                            context.startActivity(intent)
-                        }
+                    ) {
+                        // Mantener SongsScreen en la pila para poder volver
                     }
-                )
+                },
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+            ) {
+                Text("💾 Guardar playlist y ver opciones")
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            LazyColumn(
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+            ) {
+                itemsIndexed(songs) { index, song ->
+                    val isFavorite = favoriteIds.contains(song.id)
+                    val isPreviewPlaying = playingUrl == song.previewUrl
+
+                    SongItem(
+                        song = song,
+                        isFavorite = isFavorite,
+                        isPreviewPlaying = isPreviewPlaying,
+
+                        onSongClick = {
+                            previewManager.stop()
+                            AppContainer.playerQueue = songs
+                            navController.navigate(Routes.Player.createRoute(index, mood.name))
+                        },
+
+                        onToggleFavorite = {
+                            favoritesViewModel.toggleFavorite(song, isFavorite)
+                        },
+
+                        onPreviewClick = {
+                            previewManager.playOrPause(song.previewUrl)
+                        },
+
+                        onOpenExternal = {
+                            song.trackUrl?.let {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
+                                context.startActivity(intent)
+                            }
+                        }
+                    )
+                }
             }
         }
     }
