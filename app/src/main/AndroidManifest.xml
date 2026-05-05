@@ -7,7 +7,8 @@
         android:allowBackup="true"
         android:label="MoodMusic"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MoodMusic">
+        android:theme="@style/Theme.MoodMusic"
+        android:icon="@drawable/logo">
         <activity
             android:name=".MainActivity"
             android:exported="true">
