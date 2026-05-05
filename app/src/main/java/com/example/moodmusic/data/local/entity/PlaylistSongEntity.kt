@@ -9,6 +9,7 @@ import androidx.room.Entity
 data class PlaylistSongEntity(
     val playlistId: String,
     val songId: String,
+    val position: Int,
     val title: String,
     val artist: String,
     val imageUrl: String?,

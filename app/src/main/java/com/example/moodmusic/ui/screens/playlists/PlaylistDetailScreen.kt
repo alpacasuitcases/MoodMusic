@@ -17,13 +17,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.moodmusic.data.local.entity.PlaylistEntity
 import com.example.moodmusic.di.AppContainer
+import com.example.moodmusic.domain.model.Song
 import com.example.moodmusic.player.PreviewPlayerManager
 import com.example.moodmusic.ui.components.SongItem
 import com.example.moodmusic.ui.navigation.Routes
 import com.example.moodmusic.ui.viewmodel.FavoritesViewModel
-import com.example.moodmusic.ui.viewmodel.SongsViewModel
 import com.example.moodmusic.ui.viewmodel.factory.FavoritesViewModelFactory
-import com.example.moodmusic.ui.viewmodel.factory.SongsViewModelFactory
 
 @Composable
 fun PlaylistDetailScreen(
@@ -31,32 +30,22 @@ fun PlaylistDetailScreen(
     onBackClick: () -> Unit,
     navController: NavController
 ) {
-
-    val songsViewModel: SongsViewModel = viewModel(
-        factory = SongsViewModelFactory(
-            AppContainer.musicRepository,
-            AppContainer.playlistRepository
-        )
-    )
-
     val favoritesViewModel: FavoritesViewModel = viewModel(
         factory = FavoritesViewModelFactory(AppContainer.favoritesRepository)
     )
 
-    val songs by songsViewModel.currentPlaylist.collectAsState()
     val favoriteIds by favoritesViewModel.favoriteIds.collectAsState()
-
     val context = LocalContext.current
     val previewManager = remember { PreviewPlayerManager(context) }
+    val playingUrl by previewManager.playingUrl.collectAsState()
 
     var playlist by remember { mutableStateOf<PlaylistEntity?>(null) }
+    var songs    by remember { mutableStateOf<List<Song>>(emptyList()) }
 
     // Cargar canciones reales desde DB
     LaunchedEffect(playlistId) {
         playlist = AppContainer.playlistRepository.getPlaylistById(playlistId)
-
-        val songs = AppContainer.playlistRepository.getSongs(playlistId)
-        songsViewModel.setPlaylist(songs)
+        songs = AppContainer.playlistRepository.getSongs(playlistId)
     }
 
     DisposableEffect(Unit) {
@@ -64,64 +53,64 @@ fun PlaylistDetailScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-
-        // Fondo simple (ya no tienes mood aquí)
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(Color.DarkGray, Color.Black)
-                    )
-                )
+                .background(Brush.verticalGradient(listOf(Color(0xFF2C2C54), Color.Black)))
         )
 
         Column {
-
-            TextButton(onClick = onBackClick) {
-                Text("← Volver")
-            }
+            TextButton(onClick = onBackClick) { Text("← Volver", color = Color.White) }
 
             Text(
-                text = "Playlist",
+                text = playlist?.name ?: "Playlist",
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(16.dp)
+                color = Color.White,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
 
-            LazyColumn {
-                itemsIndexed(songs) { index, song ->
+            if (songs.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Color.White)
+                }
+            } else {
+                LazyColumn {
+                    itemsIndexed(songs) { index, song ->
+                        val isFavorite      = favoriteIds.contains(song.id)
+                        val isPreviewPlaying = playingUrl == song.previewUrl
 
-                    val isFavorite = favoriteIds.contains(song.id)
+                        SongItem(
+                            song             = song,
+                            isFavorite       = isFavorite,
+                            isPreviewPlaying = isPreviewPlaying,
 
-                    SongItem(
-                        song = song,
-                        isFavorite = isFavorite,
-                        isPreviewPlaying = previewManager.isPlaying(song.previewUrl),
-
-                        onSongClick = {
-                            navController.navigate(
-                                Routes.Player.createRoute(
-                                    index,
-                                    playlist?.mood ?: "HAPPY"
+                            onSongClick = {
+                                // Guardar lista con orden correcto y navegar
+                                previewManager.stop()
+                                AppContainer.playerQueue = songs
+                                navController.navigate(
+                                    Routes.Player.createRoute(index, playlist?.mood ?: "HAPPY")
                                 )
-                            )
-                        },
+                            },
 
-                        onToggleFavorite = {
-                            favoritesViewModel.toggleFavorite(song, isFavorite)
-                        },
+                            onToggleFavorite = {
+                                favoritesViewModel.toggleFavorite(song, isFavorite)
+                            },
 
-                        onPreviewClick = {
-                            previewManager.playOrPause(song.previewUrl)
-                        },
+                            onPreviewClick = {
+                                previewManager.playOrPause(song.previewUrl)
+                            },
 
-                        onOpenExternal = {
-                            song.trackUrl?.let {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
-                                context.startActivity(intent)
+                            onOpenExternal = {
+                                song.trackUrl?.let {
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it)))
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }

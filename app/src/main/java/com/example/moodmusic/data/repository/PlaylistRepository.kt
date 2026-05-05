@@ -13,15 +13,16 @@ class PlaylistRepository(private val dao: PlaylistDao) {
     ) {
         dao.insertPlaylist(playlist)
 
-        val songEntities = songs.map {
+        val songEntities = songs.mapIndexed { index, song ->
             PlaylistSongEntity(
                 playlistId = playlist.id,
-                songId = it.id,
-                title = it.title,
-                artist = it.artist,
-                imageUrl = it.imageUrl,
-                previewUrl = it.previewUrl,
-                trackUrl = it.trackUrl
+                songId = song.id,
+                position = index,
+                title = song.title,
+                artist = song.artist,
+                imageUrl = song.imageUrl,
+                previewUrl = song.previewUrl,
+                trackUrl = song.trackUrl
             )
         }
 

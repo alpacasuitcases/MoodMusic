@@ -18,7 +18,7 @@ import com.example.moodmusic.data.local.entity.PlaylistSongEntity
                 PlaylistEntity::class,
                 PlaylistSongEntity::class,
                ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class MoodMusicDatabase : RoomDatabase() {
