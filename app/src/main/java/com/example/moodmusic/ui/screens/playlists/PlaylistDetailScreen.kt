@@ -23,6 +23,7 @@ import com.example.moodmusic.ui.components.SongItem
 import com.example.moodmusic.ui.navigation.Routes
 import com.example.moodmusic.ui.viewmodel.FavoritesViewModel
 import com.example.moodmusic.ui.viewmodel.factory.FavoritesViewModelFactory
+import com.example.moodmusic.ui.components.BackButton
 
 @Composable
 fun PlaylistDetailScreen(
@@ -60,7 +61,7 @@ fun PlaylistDetailScreen(
         )
 
         Column {
-            TextButton(onClick = onBackClick) { Text("← Volver", color = Color.White) }
+            BackButton(onClick = onBackClick)
 
             Text(
                 text = playlist?.name ?: "Playlist",
@@ -103,12 +104,6 @@ fun PlaylistDetailScreen(
                             onPreviewClick = {
                                 previewManager.playOrPause(song.previewUrl)
                             },
-
-                            onOpenExternal = {
-                                song.trackUrl?.let {
-                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it)))
-                                }
-                            }
                         )
                     }
                 }

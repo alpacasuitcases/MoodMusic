@@ -2,12 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
         android:allowBackup="true"
         android:label="MoodMusic"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MoodMusic"
+        android:theme="@style/Theme.MoodMusic.Splash"
         android:icon="@drawable/logo">
         <activity
             android:name=".MainActivity"

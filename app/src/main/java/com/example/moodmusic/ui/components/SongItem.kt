@@ -23,8 +23,7 @@ fun SongItem(
     isPreviewPlaying: Boolean,
     onSongClick: () -> Unit,
     onToggleFavorite: () -> Unit,
-    onPreviewClick: () -> Unit,
-    onOpenExternal: () -> Unit
+    onPreviewClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -126,38 +125,21 @@ fun SongItem(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = onPreviewClick,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(50.dp),
                     colors = if (isPreviewPlaying)
                         ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-                    else
-                        ButtonDefaults.buttonColors()
-                ) {
-                    Text(if (isPreviewPlaying) "❚❚ Pausar" else "▶ Preview")
-                }
+                    else ButtonDefaults.buttonColors()
+                ) { Text(if (isPreviewPlaying) "⏸ Pausar" else "▶ Preview") }
 
                 OutlinedButton(
                     onClick = onToggleFavorite,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(50.dp)
-                ) {
-                    Text(if (isFavorite) "✘ Quitar" else "\uD83E\uDD0D Favorito")
-                }
-            }
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            OutlinedButton(
-                onClick = onOpenExternal,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(50.dp)
-            ) {
-                Text("♫ Abrir canción completa")
+                ) { Text(if (isFavorite) "✘ Quitar" else "🤍 Favorito") }
             }
         }
     }

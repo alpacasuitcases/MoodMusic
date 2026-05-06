@@ -26,6 +26,7 @@ import com.example.moodmusic.player.PreviewPlayerManager
 import com.example.moodmusic.ui.components.MoodBackground
 import com.example.moodmusic.ui.theme.colorForMood
 import kotlinx.coroutines.delay
+import com.example.moodmusic.ui.components.BackButton
 
 @Composable
 fun PlayerScreen(
@@ -43,7 +44,6 @@ fun PlayerScreen(
     var currentIndex by remember { mutableStateOf(startIndex) }
     val currentSong = songs.getOrNull(currentIndex)
 
-    var showLyrics by remember { mutableStateOf(false) }
     var isLoop by remember { mutableStateOf(false) }
 
     var progress by remember { mutableStateOf(0f) }
@@ -103,12 +103,10 @@ fun PlayerScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            TextButton(onClick = {
-                previewManager.stop()
-                navController.popBackStack()
-            }) {
-                Text("← Volver", color = Color.White)
-            }
+            BackButton(
+                onClick = { previewManager.stop(); navController.popBackStack() },
+                tint = Color.White
+            )
 
             // Carátula
             Box(
@@ -176,48 +174,48 @@ fun PlayerScreen(
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
             ) {
                 // Anterior
                 FilledTonalButton(
-                    onClick = {
-                        if (currentIndex > 0) {
-                            currentIndex--
-                            progress = 0f
-                        }
-                    },
-                    enabled = currentIndex > 0
-                ) { Text("⏮\uFE0F", style = MaterialTheme.typography.titleLarge) }
-
-                // Play / Pausa — BOTÓN PRINCIPAL
-                Button(
-                    onClick = {
-                        currentSong?.previewUrl?.let { url ->
-                            previewManager.playOrPause(url)
-                        }
-                    },
-                    modifier = Modifier.size(72.dp),
+                    onClick = { if (currentIndex > 0) { currentIndex--; progress = 0f } },
+                    enabled = currentIndex > 0,
                     shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = Color.White.copy(alpha = 0.25f),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.size(56.dp)
+                ) { Text("⏮", style = MaterialTheme.typography.titleLarge) }
+
+                // Play / Pausa principal
+                Button(
+                    onClick = { currentSong?.previewUrl?.let { url -> previewManager.playOrPause(url) } },
+                    modifier = Modifier.size(80.dp),
+                    shape = RoundedCornerShape(50),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
                 ) {
                     Text(
-                        text = if (isPlaying) "⏸\uFE0F" else "▶\uFE0F",
+                        text = if (isPlaying) "⏸" else "▶",
                         style = MaterialTheme.typography.headlineMedium,
-                        color = Color.Black
+                        color = Color(0xFF5C6BC0)
                     )
                 }
 
                 // Siguiente
                 FilledTonalButton(
-                    onClick = {
-                        if (currentIndex < songs.size - 1) {
-                            currentIndex++
-                            progress = 0f
-                        }
-                    },
-                    enabled = currentIndex < songs.size - 1
-                ) { Text("⏭\uFE0F", style = MaterialTheme.typography.titleLarge) }
+                    onClick = { if (currentIndex < songs.size - 1) { currentIndex++; progress = 0f } },
+                    enabled = currentIndex < songs.size - 1,
+                    shape = RoundedCornerShape(50),
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = Color.White.copy(alpha = 0.25f),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.size(56.dp)
+                ) { Text("⏭", style = MaterialTheme.typography.titleLarge) }
             }
+
 
             // Bucle y abrir en completo
             Row(
@@ -244,34 +242,6 @@ fun PlayerScreen(
                     border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
                 ) {
                     Text("🎵 iTunes")
-                }
-            }
-
-            //Letra
-            OutlinedButton(
-                onClick = { showLyrics = !showLyrics },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
-            ) {
-                Text(if (showLyrics) "Ocultar letra" else "Ver letra")
-            }
-
-            if (showLyrics) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.Black.copy(alpha = 0.35f)
-                    )
-                ) {
-                    Text(
-                        text = currentSong?.lyrics
-                            ?: "No hay letra disponible.\nAbre la canción completa en iTunes para verla.",
-                        modifier = Modifier.padding(16.dp),
-                        color = Color.White.copy(alpha = 0.90f),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
                 }
             }
 

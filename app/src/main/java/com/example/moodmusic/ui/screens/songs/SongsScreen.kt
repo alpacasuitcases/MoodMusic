@@ -28,6 +28,8 @@ import com.example.moodmusic.ui.viewmodel.SongsViewModel
 import com.example.moodmusic.ui.viewmodel.factory.FavoritesViewModelFactory
 import com.example.moodmusic.ui.viewmodel.factory.HistoryViewModelFactory
 import com.example.moodmusic.ui.viewmodel.factory.SongsViewModelFactory
+import com.example.moodmusic.util.NotificationHelper
+import com.example.moodmusic.ui.components.BackButton
 
 @Composable
 fun SongsScreen(
@@ -92,9 +94,7 @@ fun SongsScreen(
 
         Column(modifier = Modifier.fillMaxSize()) {
 
-            TextButton(onClick = onBackClick) {
-                Text("← Volver")
-            }
+            BackButton(onClick = onBackClick)
 
             Text(
                 text = "$emoji Canciones para $emotionName",
@@ -144,18 +144,14 @@ fun SongsScreen(
 
                         onToggleFavorite = {
                             favoritesViewModel.toggleFavorite(song, isFavorite)
+                            if (!isFavorite) {
+                                NotificationHelper.showFavoriteSaved(context, song.title, song.artist)
+                            }
                         },
 
                         onPreviewClick = {
                             previewManager.playOrPause(song.previewUrl)
                         },
-
-                        onOpenExternal = {
-                            song.trackUrl?.let {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
-                                context.startActivity(intent)
-                            }
-                        }
                     )
                 }
             }

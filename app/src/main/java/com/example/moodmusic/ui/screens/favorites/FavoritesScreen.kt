@@ -28,6 +28,7 @@ import com.example.moodmusic.ui.components.SongItem
 import com.example.moodmusic.ui.theme.AppBackground
 import com.example.moodmusic.ui.viewmodel.FavoritesViewModel
 import com.example.moodmusic.ui.viewmodel.factory.FavoritesViewModelFactory
+import com.example.moodmusic.ui.components.BackButton
 
 @Composable
 fun FavoritesScreen(
@@ -54,12 +55,7 @@ fun FavoritesScreen(
             .fillMaxSize()
             .background(AppBackground)
     ) {
-        TextButton(
-            onClick = onBackClick,
-            modifier = Modifier.padding(start = 8.dp, top = 8.dp)
-        ) {
-            Text("← Volver")
-        }
+        BackButton(onClick = onBackClick)
 
         Text(
             text = "Tus canciones favoritas",
@@ -97,12 +93,6 @@ fun FavoritesScreen(
                     onPreviewClick = {
                         previewManager.playOrPause(song.previewUrl)
                     },
-                    onOpenExternal = {
-                        song.trackUrl?.let { url ->
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                            context.startActivity(intent)
-                        }
-                    }
                 )
             }
         }

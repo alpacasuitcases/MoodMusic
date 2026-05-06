@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MoodMusic" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.MoodMusic.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#F7F7FB</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
+        <item name="windowSplashScreenAnimationDuration">800</item>
+        <item name="postSplashScreenTheme">@style/Theme.MoodMusic</item>
+    </style>
+
+    <style name="Theme.MoodMusic" parent="android:style/Theme.Material.Light.NoActionBar" />
+
 </resources>

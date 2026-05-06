@@ -12,6 +12,7 @@ import com.example.moodmusic.di.AppContainer
 import com.example.moodmusic.ui.viewmodel.PlaylistsViewModel
 import com.example.moodmusic.ui.viewmodel.factory.PlaylistsViewModelFactory
 import com.example.moodmusic.data.local.entity.PlaylistEntity
+import com.example.moodmusic.ui.components.BackButton
 
 @Composable
 fun PlaylistsScreen(
@@ -26,9 +27,7 @@ fun PlaylistsScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
 
-        TextButton(onClick = onBackClick) {
-            Text("← Volver")
-        }
+        BackButton(onClick = onBackClick)
 
         Text(
             text = "Tus playlists",

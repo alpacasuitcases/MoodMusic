@@ -23,6 +23,7 @@ import com.example.moodmusic.ui.viewmodel.HistoryViewModel
 import com.example.moodmusic.ui.viewmodel.factory.HistoryViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.*
+import com.example.moodmusic.ui.components.BackButton
 
 // Periodos del tab
 private enum class HistoryPeriod(val label: String) {
@@ -51,11 +52,7 @@ fun HistoryScreen(onBackClick: () -> Unit) {
             .fillMaxSize()
             .background(AppBackground)
     ) {
-        // Cabecera
-        TextButton(
-            onClick = onBackClick,
-            modifier = Modifier.padding(start = 8.dp, top = 8.dp)
-        ) { Text("← Volver") }
+        BackButton(onClick = onBackClick)
 
         Text(
             text = "📊 Historial emocional",
