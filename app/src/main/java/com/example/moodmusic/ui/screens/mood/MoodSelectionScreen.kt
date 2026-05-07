@@ -6,7 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -44,7 +44,7 @@ fun MoodSelectionScreen(
                 NavigationBarItem(
                     selected = false,
                     onClick = onPlaylists,
-                    icon = { Icon(Icons.Default.List, contentDescription = "Playlists") },
+                    icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = "Playlists") },
                     label = { Text("Playlists") }
                 )
                 NavigationBarItem(

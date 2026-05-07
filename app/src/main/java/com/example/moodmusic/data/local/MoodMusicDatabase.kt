@@ -39,7 +39,7 @@ abstract class MoodMusicDatabase : RoomDatabase() {
                     MoodMusicDatabase::class.java,
                     "moodmusic_db"
                 )
-                .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(true)
                 .build()
                 INSTANCE = instance
                 instance

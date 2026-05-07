@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,16 +68,10 @@ fun HistoryScreen(onBackClick: () -> Unit) {
         }
         // Tabs de periodo
         val tabs = HistoryPeriod.entries
-        TabRow(
+        PrimaryTabRow(
             selectedTabIndex = tabs.indexOf(selectedPeriod),
             containerColor = Color.Transparent,
             contentColor = AppPrimary,
-            indicator = { tabPositions ->
-                TabRowDefaults.SecondaryIndicator(
-                    modifier = Modifier.tabIndicatorOffset(tabPositions[tabs.indexOf(selectedPeriod)]),
-                    color = AppPrimary
-                )
-            },
             modifier = Modifier.padding(horizontal = 12.dp)
         ) {
             tabs.forEach { period ->
@@ -310,7 +303,7 @@ private fun filterByPeriod(history: List<MoodEntry>, period: HistoryPeriod): Lis
 }
 
 private fun groupByDay(entries: List<MoodEntry>): Map<String, List<MoodEntry>> {
-    val dayFmt = SimpleDateFormat("EEEE, d MMMM", Locale("es", "ES"))
+    val dayFmt = SimpleDateFormat("EEEE, d MMMM", Locale.forLanguageTag("es-ES"))
     val todayStr = dayFmt.format(Date())
     val yesterdayStr = dayFmt.format(Date(System.currentTimeMillis() - 86_400_000L))
 
