@@ -52,16 +52,23 @@ fun HistoryScreen(onBackClick: () -> Unit) {
             .fillMaxSize()
             .background(AppBackground)
     ) {
-        BackButton(onClick = onBackClick)
+        Spacer(modifier = Modifier.height(48.dp))
 
-        Text(
-            text = "📊 Historial emocional",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
-        )
-
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 4.dp, end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BackButton(onClick = onBackClick)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Historial emocional",
+                style = MaterialTheme.typography.headlineMedium
+            )
+        }
         // Tabs de periodo
-        val tabs = HistoryPeriod.values()
+        val tabs = HistoryPeriod.entries
         TabRow(
             selectedTabIndex = tabs.indexOf(selectedPeriod),
             containerColor = Color.Transparent,
@@ -241,33 +248,53 @@ private fun EmotionBarChart(
 
 // Tarjeta de entrada
 
-@Composable
-private fun MoodHistoryCard(entry: MoodEntry) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+    @Composable
+    private fun MoodHistoryCard(entry: MoodEntry) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            Text(
-                text = entry.moodName,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = formatTime(entry.timestamp),
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    // Fondo coloreado para el emoji
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = AppPrimary.copy(alpha = 0.10f),
+                        modifier = Modifier.size(38.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            // El moodName viene como "😄 Alegría" — separamos emoji y texto
+                            val parts = entry.moodName.split(" ", limit = 2)
+                            Text(
+                                text = parts.firstOrNull() ?: "🎵",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                    }
+                    Text(
+                        text = entry.moodName.split(" ", limit = 2).getOrElse(1) { entry.moodName },
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                }
+                Text(
+                    text = formatTime(entry.timestamp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }
         }
     }
-}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -300,10 +327,5 @@ private fun groupByDay(entries: List<MoodEntry>): Map<String, List<MoodEntry>> {
 
 private fun formatTime(timestamp: Long): String {
     val fmt = SimpleDateFormat("HH:mm", Locale.getDefault())
-    return fmt.format(Date(timestamp))
-}
-
-private fun formatDate(timestamp: Long): String {
-    val fmt = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
     return fmt.format(Date(timestamp))
 }

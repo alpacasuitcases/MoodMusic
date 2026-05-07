@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.example.moodmusic.domain.model.MoodType
 import com.example.moodmusic.ui.components.MoodBackground
 import com.example.moodmusic.ui.theme.colorForMood
+import com.example.moodmusic.ui.components.BackButton
 
 @Composable
 fun DashboardScreen(
@@ -45,6 +46,11 @@ fun DashboardScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Cabecera
+            BackButton(
+                onClick = onBackToSongs,
+                tint = Color.White,
+                containerColor = Color.White.copy(alpha = 0.25f)
+            )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Spacer(modifier = Modifier.height(32.dp))
 

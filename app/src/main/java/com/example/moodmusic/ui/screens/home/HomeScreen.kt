@@ -19,9 +19,13 @@ import androidx.compose.ui.unit.dp
 import com.example.moodmusic.R
 import com.example.moodmusic.ui.theme.AppBackground
 import com.example.moodmusic.ui.theme.AppPrimary
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.unit.sp
 
 @Composable
-fun HomeScreen(onStartClick: () -> Unit) {
+fun HomeScreen(
+    onStartClick: () -> Unit
+) {
     // Animaciones de entrada
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
@@ -57,7 +61,7 @@ fun HomeScreen(onStartClick: () -> Unit) {
                     painter = painterResource(id = R.drawable.logo),
                     contentDescription = "MoodMusic logo",
                     modifier = Modifier
-                        .size(140.dp)
+                        .size(200.dp)
                         .scale(logoScale)
                 )
 
@@ -90,7 +94,7 @@ fun HomeScreen(onStartClick: () -> Unit) {
                     colors = ButtonDefaults.buttonColors(containerColor = AppPrimary)
                 ) {
                     Text(
-                        text = "Empezar  🎵",
+                        text = "Empezar",
                         style = MaterialTheme.typography.titleMedium
                     )
                 }

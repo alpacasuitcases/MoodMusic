@@ -48,4 +48,9 @@ class PlaylistRepository(private val dao: PlaylistDao) {
     suspend fun getPlaylistById(id: String): PlaylistEntity? {
         return dao.getPlaylistById(id)
     }
+
+    suspend fun deletePlaylist(playlist: PlaylistEntity) {
+        dao.deleteSongsForPlaylist(playlist.id)
+        dao.deletePlaylist(playlist)
+    }
 }

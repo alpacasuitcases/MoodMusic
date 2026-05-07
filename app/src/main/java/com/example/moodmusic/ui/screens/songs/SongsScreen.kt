@@ -65,15 +65,10 @@ fun SongsScreen(
 
     // Cargar canciones
     LaunchedEffect(query) {
-        songsViewModel.searchSongs(query, mood, emotionName)
-    }
-
-    // Guardar en historial
-    LaunchedEffect(emotionName) {
-        historyViewModel.addMood("$emoji $emotionName")
-    }
-    DisposableEffect(Unit) {
-        onDispose { previewManager.release() }
+        if (songs.isEmpty()) {
+            songsViewModel.searchSongs(query, mood, emotionName)
+            historyViewModel.addMood("$emoji $emotionName")  // ← mueve aquí
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -100,6 +95,13 @@ fun SongsScreen(
                 text = "$emoji Canciones para $emotionName",
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+            )
+
+            Text(
+                text = "${songs.size} canciones",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
             )
 
             Button(

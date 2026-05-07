@@ -14,6 +14,7 @@ import com.example.moodmusic.ui.screens.dashboard.DashboardScreen
 import com.example.moodmusic.ui.screens.favorites.FavoritesScreen
 import com.example.moodmusic.ui.screens.history.HistoryScreen
 import com.example.moodmusic.ui.screens.home.HomeScreen
+import com.example.moodmusic.ui.screens.home.SplashScreen
 import com.example.moodmusic.ui.screens.mood.MoodSelectionScreen
 import com.example.moodmusic.ui.screens.player.PlayerScreen
 import com.example.moodmusic.ui.screens.playlists.PlaylistDetailScreen
@@ -28,8 +29,18 @@ fun AppNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = Routes.Home.route
+        startDestination = Routes.Splash.route
     ) {
+        // SPLASH
+        composable(Routes.Splash.route) {
+            SplashScreen(
+                onSplashFinished = {
+                    navController.navigate(Routes.Home.route) {
+                        popUpTo(Routes.Splash.route) { inclusive = true }
+                    }
+                }
+            )
+        }
 
         // HOME
         composable(Routes.Home.route) {
@@ -50,7 +61,10 @@ fun AppNavigation() {
                             mood = emotion.mood.name
                         )
                     )
-                }
+                },
+                onFavorites = { navController.navigate(Routes.Favorites.route) },
+                onPlaylists = { navController.navigate(Routes.Playlists.route) },
+                onHistory  = { navController.navigate(Routes.History.route) }
             )
         }
 

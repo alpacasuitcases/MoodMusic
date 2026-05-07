@@ -1,6 +1,7 @@
 package com.example.moodmusic.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -25,4 +26,10 @@ interface PlaylistDao {
 
     @Query("SELECT * FROM playlists WHERE id = :id LIMIT 1")
     suspend fun getPlaylistById(id: String): PlaylistEntity?
+
+    @Delete
+    suspend fun deletePlaylist(playlist: PlaylistEntity)
+
+    @Query("DELETE FROM playlist_songs WHERE playlistId = :playlistId")
+    suspend fun deleteSongsForPlaylist(playlistId: String)
 }

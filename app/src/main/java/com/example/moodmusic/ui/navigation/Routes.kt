@@ -3,6 +3,8 @@ package com.example.moodmusic.ui.navigation
 import android.net.Uri
 
 sealed class Routes(val route: String) {
+
+    data object Splash : Routes("splash")
     data object Home : Routes("home")
     data object Mood : Routes("mood")
 
