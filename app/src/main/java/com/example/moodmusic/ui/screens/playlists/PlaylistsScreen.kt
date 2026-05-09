@@ -38,11 +38,7 @@ fun PlaylistsScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF1A1A2E),
-                        Color(0xFF16213E),
-                        Color(0xFF0F3460)
-                    )
+                    listOf(Color(0xFFE8EAF6), Color(0xFFF3F0FF), Color(0xFFF7F7FB))
                 )
             )
     ) {
@@ -58,14 +54,11 @@ fun PlaylistsScreen(
             ) {
                 BackButton(
                     onClick = onBackClick,
-                    tint = Color.White,
-                    containerColor = Color.White.copy(alpha = 0.20f)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Tus Playlists 📋",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White
                 )
             }
 
@@ -85,13 +78,11 @@ fun PlaylistsScreen(
                         Text(
                             text = "Todavía no tienes playlists",
                             style = MaterialTheme.typography.titleMedium,
-                            color = Color.White.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center
                         )
                         Text(
                             text = "Guarda tu primera lista desde la pantalla de canciones",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White.copy(alpha = 0.45f),
                             modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp),
                             textAlign = TextAlign.Center
                         )
@@ -143,8 +134,8 @@ private fun PlaylistCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.12f)),
-        elevation = CardDefaults.cardElevation(0.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Row(
             modifier = Modifier
@@ -155,14 +146,14 @@ private fun PlaylistCard(
         ) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = Color.White.copy(alpha = 0.18f),
+                color = MaterialTheme.colorScheme.primaryContainer,
                 modifier = Modifier.size(48.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.Default.MusicNote,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(26.dp)
                     )
                 }
@@ -170,13 +161,12 @@ private fun PlaylistCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = playlist.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Text(
                     text = playlist.mood,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.55f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
                 )
             }
             IconButton(
@@ -186,7 +176,7 @@ private fun PlaylistCard(
                 Icon(
                     Icons.Default.Delete,
                     contentDescription = "Eliminar",
-                    tint = Color.White.copy(alpha = 0.55f),
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
                     modifier = Modifier.size(20.dp)
                 )
             }

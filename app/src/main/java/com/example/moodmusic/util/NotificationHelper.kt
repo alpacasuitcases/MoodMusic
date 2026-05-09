@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.example.moodmusic.R
 
 object NotificationHelper {
@@ -17,25 +16,36 @@ object NotificationHelper {
     fun createChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                CHANNEL_ID, CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_LOW
-            ).apply { description = "Notificaciones de canciones favoritas" }
-            val manager = context.getSystemService(NotificationManager::class.java)
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Notificaciones de canciones favoritas"
+            }
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }
     }
 
     fun showFavoriteSaved(context: Context, songTitle: String, artist: String) {
-        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (!manager.areNotificationsEnabled()) return
+        }
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.logo)
             .setContentTitle("❤️ Añadido a favoritos")
             .setContentText("$songTitle — $artist")
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
+            .build()
+
         try {
-            NotificationManagerCompat.from(context).notify(notifId++, builder.build())
-        } catch (e: SecurityException) {
-            // Permiso no concedido — ignorar silenciosamente
+            manager.notify(notifId++, notification)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

@@ -9,12 +9,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.moodmusic.domain.model.MoodType
+import com.example.moodmusic.ui.components.BackButton
 import com.example.moodmusic.ui.components.MoodBackground
 import com.example.moodmusic.ui.theme.colorForMood
-import com.example.moodmusic.ui.components.BackButton
 
 @Composable
 fun DashboardScreen(
@@ -29,46 +28,42 @@ fun DashboardScreen(
     val moodColor = colorForMood(mood)
 
     Box(modifier = Modifier.fillMaxSize()) {
+
+        // Fondo
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(listOf(moodColor, Color(0xFF1A1A2E)))
-                )
+                .background(Brush.verticalGradient(listOf(moodColor, Color(0xFF1A1A2E))))
         )
         MoodBackground(mood = mood, modifier = Modifier.fillMaxSize())
 
+        BackButton(
+            onClick = onBackToSongs,
+            tint = Color.White,
+            containerColor = Color.White.copy(alpha = 0.25f),
+            modifier = Modifier.align(Alignment.TopStart)
+        )
+
+        // Contenido centrado debajo del botón
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(28.dp),
+                .padding(top = 72.dp, start = 28.dp, end = 28.dp, bottom = 28.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Cabecera
-            BackButton(
-                onClick = onBackToSongs,
-                tint = Color.White,
-                containerColor = Color.White.copy(alpha = 0.25f)
-            )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Spacer(modifier = Modifier.height(32.dp))
-
                 Text(
                     text = "🎶",
                     style = MaterialTheme.typography.displayMedium
                 )
-
                 Spacer(modifier = Modifier.height(8.dp))
-
                 Text(
                     text = "MoodMusic",
                     style = MaterialTheme.typography.headlineLarge,
                     color = Color.White
                 )
-
                 Spacer(modifier = Modifier.height(6.dp))
-
                 Card(
                     shape = RoundedCornerShape(50.dp),
                     colors = CardDefaults.cardColors(
@@ -84,46 +79,36 @@ fun DashboardScreen(
                 }
             }
 
-            // Opciones principales
             Column(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 DashboardButton(
-                    emoji = "🎵",
-                    label = "Ver canciones actuales",
+                    emoji = "🎵", label = "Ver canciones actuales",
                     description = "Vuelve a la lista de canciones",
                     onClick = onBackToSongs,
                     containerColor = Color.White.copy(alpha = 0.18f)
                 )
-
                 DashboardButton(
-                    emoji = "➕",
-                    label = "Nueva emoción",
+                    emoji = "➕", label = "Nueva emoción",
                     description = "Busca música para otra emoción",
                     onClick = onNewMood,
                     containerColor = Color.White.copy(alpha = 0.18f)
                 )
-
                 DashboardButton(
-                    emoji = "❤️",
-                    label = "Ver favoritos",
+                    emoji = "❤️", label = "Ver favoritos",
                     description = "Tus canciones guardadas",
                     onClick = onFavorites,
                     containerColor = Color.White.copy(alpha = 0.18f)
                 )
-
                 DashboardButton(
-                    emoji = "📋",
-                    label = "Ver playlists",
+                    emoji = "📋", label = "Ver playlists",
                     description = "Playlists guardadas por emoción",
                     onClick = onPlaylists,
                     containerColor = Color.White.copy(alpha = 0.18f)
                 )
-
                 DashboardButton(
-                    emoji = "📊",
-                    label = "Ver historial emocional",
+                    emoji = "📊", label = "Ver historial emocional",
                     description = "Evolución y gráficas de tus emociones",
                     onClick = onHistory,
                     containerColor = Color.White.copy(alpha = 0.18f)
